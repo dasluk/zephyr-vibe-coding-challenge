@@ -3,9 +3,23 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
+    // Two platform-specific pairs below, picked explicitly by name so nobody
+    // uses the wrong one by accident:
+    //
+    // "(Windows/WSL2 local pyocd)" - for usbipd-win + WSL2, where raw USB
+    // passthrough for ST-Link into this container works directly. pyocd is
+    // spawned locally by cortex-debug against the passed-through USB device.
+    // This is also what the "pyocd" runner profile in zephyr-ide.json uses
+    // (via "kind": "launch", referencing these two configs by name).
+    //
+    // "(macOS remote pyocd)" - for Docker Desktop on macOS, where raw USB
+    // passthrough for ST-Link into this container is unreliable. Connects to
+    // a pyocd gdbserver already running on the macOS host instead of
+    // spawning pyocd locally. This is what the "pyocd-mac-remote" runner
+    // profile in zephyr-ide.json uses.
     "configurations": [
         {
-            "name": "Zephyr IDE: Debug",
+            "name": "Zephyr IDE: Debug (Windows/WSL2 local pyocd)",
             "type": "cortex-debug",
             "servertype": "pyocd",
             "request": "launch",
@@ -20,7 +34,7 @@
             "runToEntryPoint": "main"
         },
         {
-            "name": "Zephyr IDE: Attach",
+            "name": "Zephyr IDE: Attach (Windows/WSL2 local pyocd)",
             "type": "cortex-debug",
             "servertype": "pyocd",
             "request": "attach",
@@ -28,6 +42,29 @@
             "interface": "swd",
             "targetId": "STM32U385RGTXQ",
             "device": "STM32U385RGT6Q",
+            "gdbPath": "${command:zephyr-ide.get-gdb-path}",
+            "executable": "${command:zephyr-ide.get-zephyr-elf}"
+        },
+        {
+            "name": "Zephyr IDE: Debug (macOS remote pyocd)",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3333",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "armToolchainPath": "/opt/toolchains/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin",
+            "toolchainPrefix": "arm-zephyr-eabi",
+            "executable": "${command:zephyr-ide.get-zephyr-elf}",
+            "svdFile": "/workdir/boards/demo/STM32U385.svd",
+            "runToEntryPoint": "main"
+        },
+        {
+            "name": "Zephyr IDE: Attach (macOS remote pyocd)",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3333",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
             "gdbPath": "${command:zephyr-ide.get-gdb-path}",
             "executable": "${command:zephyr-ide.get-zephyr-elf}"
         }

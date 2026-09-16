@@ -1,31 +1,21 @@
 {
   "projects": {
     "app": {
-      "rel_path": "app",
+      "relPath": "app",
       "name": "app",
       "buildConfigs": {
         "build/demo": {
+          "name": "build/demo",
+          "board": "demo",
           "relBoardDir": "boards",
           "relBoardSubDir": "demo",
-          "board": "demo",
-          "name": "build/demo",
           "westBuildArgs": [],
           "westBuildCMakeArgs": [],
-          "debugOptimization": "Don't set. Will be configured in included KConfig file",
           "confFiles": {
             "config": [],
             "overlay": []
           },
-          "launchTarget": "Zephyr IDE: Debug",
-          "buildDebugTarget": "Zephyr IDE: Debug",
-          "attachTarget": "Zephyr IDE: Attach",
-          "runnerConfigs": {
-            "pyocd": {
-              "runner": "pyocd",
-              "name": "pyocd",
-              "args": ""
-            }
-          }
+          "activeProfile": "mac-pyocd"
         }
       },
       "twisterConfigs": {},
@@ -34,5 +24,41 @@
         "overlay": []
       }
     }
-  }
+  },
+  "activeProject": "app",
+  "runnerProfiles": [
+    {
+      "name": "windows-pyocd",
+      "flash": {
+        "kind": "west-flash",
+        "runner": "pyocd"
+      },
+      "debug": {
+        "kind": "launch",
+        "name": "Zephyr IDE: Debug (Windows/WSL2 local pyocd)"
+      },
+      "attach": {
+        "kind": "launch",
+        "name": "Zephyr IDE: Attach (Windows/WSL2 local pyocd)"
+      }
+    },
+    {
+      "name": "mac-pyocd",
+      "flash": {
+        "kind": "west-flash",
+        "runner": "pyocd",
+        "extraArgs": [
+          "--dev-id=remote:host.docker.internal"
+        ]
+      },
+      "debug": {
+        "kind": "launch",
+        "name": "Zephyr IDE: Debug (macOS remote pyocd)"
+      },
+      "attach": {
+        "kind": "launch",
+        "name": "Zephyr IDE: Attach (macOS remote pyocd)"
+      }
+    }
+  ]
 }

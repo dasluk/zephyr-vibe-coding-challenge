@@ -10,5 +10,6 @@
 		"**/.venv": true,
 		"**/build*": true,
 		"**/compile_commands.json": true
-	}
+	},
+	"cmake.sourceDirectory": "${workspaceFolder}/app"
 }

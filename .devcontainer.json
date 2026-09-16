@@ -18,7 +18,13 @@
     "vscode": {
       "extensions": [
         "mylonics.zephyr-ide-extension-pack",
-        "/workdir/.vscode/extensions/cortex-debug-1.13.0-pre8.vsix"
+        "/workdir/.vscode/extensions/cortex-debug-1.13.0-pre8.vsix",
+        "mcu-debug.debug-tracker-vscode",
+        "mcu-debug.memory-view",
+        "mcu-debug.rtos-views",
+        "mcu-debug.peripheral-viewer",
+        "Anthropic.claude-code",
+        "mhutchie.git-graph"
       ]
     }
   }
