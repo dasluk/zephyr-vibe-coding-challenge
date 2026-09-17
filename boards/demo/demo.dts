@@ -15,8 +15,49 @@
 		zephyr,flash = &flash0;
 	};
 
+	/*
+	 * Board I/O: onboard user button (B1).
+	 *
+	 * Pin confirmed as PC13 / GPIO_ACTIVE_HIGH against ST's own upstream
+	 * Zephyr board port for this exact SoC/package
+	 * (external/zephyr/boards/st/nucleo_u385rg_q/nucleo_u385rg_q.dts,
+	 * which this "demo" board's dts is otherwise a trimmed-down copy of),
+	 * cross-checked against ST's Nucleo-64 user manual (UM3062,
+	 * STM32U3/U5 Nucleo-64 boards MB1841) via web search. Not assumed
+	 * from the generic Nucleo-64 PC13 convention alone.
+	 */
+	gpio_keys {
+		compatible = "gpio-keys";
+
+		user_button: button_0 {
+			label = "User (B1)";
+			gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
 	aliases {
 		accelerometer = &lsm6dso16is;
+		sw0 = &user_button;
+		buzzer = &pwm1;
+	};
+};
+
+/*
+ * Board I/O: buzzer PWM output, Arduino header D8 / PC7 / TIM3 channel 2
+ * (see intent.md and specs/board-io.spec.md).
+ *
+ * st,prescaler = 95 divides the ~96MHz timer input clock down to a 1MHz
+ * counter tick, giving pwm_set()/buzzer_request() a usable audible-range
+ * resolution (~15Hz .. 500kHz, ARR 16-bit) without needing a slower clock.
+ */
+&timers3 {
+	st,prescaler = <95>;
+	status = "okay";
+
+	pwm1: pwm {
+		pinctrl-0 = <&tim3_ch2_pc7>;
+		pinctrl-names = "default";
+		status = "okay";
 	};
 };
 
