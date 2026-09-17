@@ -1,6 +1,8 @@
 /dts-v1/;
 #include <st/u3/stm32u385Xg.dtsi>
 #include <st/u3/stm32u385rgtxq-pinctrl.dtsi>
+#include <zephyr/dt-bindings/i2c/i2c.h>
+#include <zephyr/dt-bindings/sensor/lsm6dso16is.h>
 
 / {
 	model = "Workshop Demo Board";
@@ -11,6 +13,10 @@
 		zephyr,shell-uart = &usart1;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
+	};
+
+	aliases {
+		accelerometer = &lsm6dso16is;
 	};
 };
 
@@ -44,4 +50,21 @@
 	pinctrl-names = "default";
 	current-speed = <115200>;
 	status = "okay";
+};
+
+&i2c2 {
+	pinctrl-0 = <&i2c2_scl_pb13 &i2c2_sda_pb14>; // Arduino D15 + D14
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	status = "okay";
+
+	lsm6dso16is: lsm6dso16is@6a {
+		compatible = "st,lsm6dso16is";
+		reg = <0x6a>;
+		accel-range = <LSM6DSO16IS_DT_FS_4G>;
+		accel-odr = <LSM6DSO16IS_DT_ODR_104Hz_HP>;
+		gyro-range = <LSM6DSO16IS_DT_FS_500DPS>;
+		gyro-odr = <LSM6DSO16IS_DT_ODR_104Hz_HP>;
+		status = "okay";
+	};
 };
