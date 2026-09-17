@@ -10,4 +10,5 @@ target_sources(app PRIVATE
     src/sensor_driver.c
     src/board_io_buzzer.c
     src/board_io_button.c
+    src/fusion.c
 )
