@@ -87,3 +87,23 @@ All under `scripts/`, safe to re-run. Wrap each of these in
 
 - No MCP server for this.
 - New helper scripts go under `scripts/` in this skill directory.
+- **`pyocd rtt` for reading RTT logs**: it does `termios` setup for
+  keypress-to-quit, so it needs a real TTY on stdin — running it under a
+  non-interactive shell needs `script -qc "..." /dev/null` to fake a pty.
+  Sending SIGINT to `script`'s own PID does not reliably stop it; `script`
+  can leave the `pyocd` child running attached to an orphaned pty
+  indefinitely. Signal the actual `pyocd` process (find its PID, not
+  `script`'s) to stop it cleanly. Before walking away from a capture,
+  double check nothing is still holding the hardware
+  (`ps aux | grep pyocd`, and check who (if anyone) holds
+  `/tmp/zephyr-hw.lock`).
+- Control-block auto-search (`pyocd rtt` with no `-a`/`-s`) is slow and
+  sometimes fails ("Control block not found"). Reading the address with
+  `arm-zephyr-eabi-nm zephyr.elf | grep _SEGGER_RTT` and passing
+  `-a <addr> -s 64` explicitly is faster and more reliable.
+- When multiple agents/worktrees are flashing concurrently: a flash and
+  its matching RTT read must happen under the *same* `with-hw-lock.sh`
+  hold (e.g. `with-hw-lock.sh bash -c '...flash... && ...rtt...'`).
+  Acquiring the lock separately for the flash and for the read leaves a
+  gap where another teammate's flash can land on the board in between,
+  and you'll capture their firmware instead of your own.
