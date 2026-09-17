@@ -5,3 +5,4 @@ project(workshop)
 
 target_include_directories(app PRIVATE include)
 target_sources(app PRIVATE src/main.c src/controller_ipc.c)
+target_sources(app PRIVATE src/board_io_buzzer.c src/board_io_button.c)
