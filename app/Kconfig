@@ -1,0 +1,15 @@
+source "Kconfig.zephyr"
+
+menu "Communication (serial protocol) options"
+
+config CONTROLLER_ID
+	string "Controller identifier reported in the HELLO line"
+	default "ctrl-A"
+	help
+	  Sent as <controller_id> in "HELLO <controller_id> <fw_version>" at
+	  boot (see specs/communication.spec.md). Set a distinct value per
+	  flashed board (e.g. ctrl-A / ctrl-B) via a board-specific
+	  prj.conf/overlay or -DCONFIG_CONTROLLER_ID=\"ctrl-B\" so a host
+	  talking to two boards can tell them apart.
+
+endmenu
