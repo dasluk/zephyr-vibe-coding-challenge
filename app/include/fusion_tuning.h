@@ -1,0 +1,77 @@
+#pragma once
+
+/*
+ * Tunable constants for the fusion/gesture module (app/src/fusion.c).
+ *
+ * Centralized here so thresholds, filter coefficients, and timing windows
+ * can be retuned against real motion data without touching the detection
+ * logic itself. Expect these to need iteration once real hardware/mounting
+ * is available (see fusion-gesture spec + final report open questions).
+ *
+ * All accel-deviation constants are in units of g, relative to the
+ * assumed FUSION_GRAVITY_G resting baseline.
+ *
+ * --- Axis convention (heuristic, UNCONFIRMED on real hardware) ---
+ *   ax: forward(+) / back(-)          -> GESTURE_PUNCH
+ *   ay: right(+)   / left(-)          -> GESTURE_SWING_RIGHT / _LEFT
+ *   az: up(+)      / down(-) (about the resting ~1g baseline)
+ *                                     -> GESTURE_SWING_UP / _DOWN
+ * This mapping depends on how the board is physically held/mounted, which
+ * isn't confirmed yet (sensor-driver branch owns the real IMU). Likely the
+ * first thing to flip/retune once gestures are tried on real hardware.
+ */
+
+/* Deviation from the gravity baseline (g) that starts a motion episode. */
+#define FUSION_MOTION_ENTER_G          0.35f
+
+/* Deviation from baseline (g) below which the board is considered at rest
+ * again. Lower than the enter threshold on purpose (hysteresis) so a
+ * motion episode doesn't flicker closed on a single noisy dip mid-motion.
+ */
+#define FUSION_MOTION_EXIT_G           0.15f
+
+/* Consecutive "at rest" samples required (in addition to being below the
+ * exit threshold) before a motion episode is closed out and classified.
+ */
+#define FUSION_REST_CONFIRM_SAMPLES    3
+
+/* Hard cap on how long a single motion episode can run before it is
+ * force-classified. Guards against a sensor that never settles back down.
+ */
+#define FUSION_MAX_MOTION_MS           800
+
+/* Per-axis deviation magnitude (g) above which a sample counts toward
+ * sign-reversal tracking (used to distinguish SHAKE from a directional
+ * swing/punch).
+ */
+#define FUSION_REVERSAL_SIGN_G         0.2f
+
+/* Minimum number of dominant-axis sign reversals within one motion episode
+ * to classify it as GESTURE_SHAKE instead of a single directional gesture.
+ */
+#define FUSION_SHAKE_MIN_REVERSALS     3
+
+/* Cooldown after emitting a gesture event before a new motion episode can
+ * start. Keeps one physical motion from producing a flood of events. */
+#define FUSION_GESTURE_COOLDOWN_MS     300
+
+/* Peak deviation magnitude (g) that saturates reported gesture confidence
+ * to 1.0. */
+#define FUSION_CONFIDENCE_SATURATE_G   1.2f
+
+/* Assumed resting accelerometer reading (g) on the "up" axis; used as the
+ * baseline that motion deviation is measured against. */
+#define FUSION_GRAVITY_G               1.0f
+
+/* --- Continuous tilt_x (roll) axis --- */
+
+/* Low-pass filter coefficient (exponential moving average), in (0,1].
+ * Higher = less smoothing / more responsive. */
+#define FUSION_TILT_LPF_ALPHA          0.15f
+
+/* Publish period for the tilt_x EVT_AXIS event; throttled so the
+ * downstream serial link isn't flooded (spec: ~20 Hz). */
+#define FUSION_TILT_PUBLISH_MS         50
+
+/* Roll angle (deg) that normalizes to a full-scale +-1.0 axis value. */
+#define FUSION_TILT_MAX_DEG            45.0f
