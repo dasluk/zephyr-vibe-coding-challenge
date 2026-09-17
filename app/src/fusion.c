@@ -118,7 +118,10 @@ static void gesture_sm_classify_and_emit(struct gesture_sm *sm, int64_t t_ms)
     } else if (apx >= apy && apx >= apz) {
         gid = GESTURE_PUNCH;
     } else if (apz >= apx && apz >= apy) {
-        gid = (sm->peak_dz >= 0.f) ? GESTURE_SWING_UP : GESTURE_SWING_DOWN;
+        /* Confirmed inverted on real hardware vs. the original guess
+         * (see fusion_tuning.h axis convention note): a physical swing up
+         * peaks negative on dz, not positive. */
+        gid = (sm->peak_dz >= 0.f) ? GESTURE_SWING_DOWN : GESTURE_SWING_UP;
     } else {
         gid = (sm->peak_dy >= 0.f) ? GESTURE_SWING_RIGHT : GESTURE_SWING_LEFT;
     }

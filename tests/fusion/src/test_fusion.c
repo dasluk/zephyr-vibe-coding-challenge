@@ -157,17 +157,20 @@ ZTEST(fusion, test_gesture_recognition_sequence)
     zassert_equal(first, GESTURE_PUNCH, "punch trace classified as %d", first);
 
     /* --- Phase 5 (bonus): swing up -- same ramp shape again but on the
-     * vertical axis (az, deviation from the 1g baseline). Expect exactly
-     * one SWING_UP. --- */
-    feed(0.0f, 0.0f, 1.10f);
-    feed(0.0f, 0.0f, 1.25f);
-    feed(0.0f, 0.0f, 1.45f);
-    feed(0.0f, 0.0f, 1.65f);
-    feed(0.0f, 0.0f, 1.90f);
-    feed(0.0f, 0.0f, 1.90f);
-    feed(0.0f, 0.0f, 1.60f);
-    feed(0.0f, 0.0f, 1.30f);
-    feed(0.0f, 0.0f, 1.10f);
+     * vertical axis (az, deviation from the 1g baseline). Peak deviation
+     * is negative (az dips below the 1g baseline) since real-hardware
+     * testing confirmed a physical swing up reads that way, not positive
+     * -- see fusion_tuning.h's axis convention note. Expect exactly one
+     * SWING_UP. --- */
+    feed(0.0f, 0.0f, 0.90f);
+    feed(0.0f, 0.0f, 0.75f);
+    feed(0.0f, 0.0f, 0.55f);
+    feed(0.0f, 0.0f, 0.35f);
+    feed(0.0f, 0.0f, 0.10f);
+    feed(0.0f, 0.0f, 0.10f);
+    feed(0.0f, 0.0f, 0.40f);
+    feed(0.0f, 0.0f, 0.70f);
+    feed(0.0f, 0.0f, 0.90f);
     settle();
     n = drain_events(evts, MAX_EVENTS);
     gestures = count_gestures(evts, n, &first);

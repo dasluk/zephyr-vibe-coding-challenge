@@ -11,14 +11,20 @@
  * All accel-deviation constants are in units of g, relative to the
  * assumed FUSION_GRAVITY_G resting baseline.
  *
- * --- Axis convention (heuristic, UNCONFIRMED on real hardware) ---
- *   ax: forward(+) / back(-)          -> GESTURE_PUNCH
+ * --- Axis convention ---
+ *   ax: forward(+) / back(-)          -> GESTURE_PUNCH   (still a heuristic
+ *                                        guess, unconfirmed on hardware)
  *   ay: right(+)   / left(-)          -> GESTURE_SWING_RIGHT / _LEFT
- *   az: up(+)      / down(-) (about the resting ~1g baseline)
- *                                     -> GESTURE_SWING_UP / _DOWN
- * This mapping depends on how the board is physically held/mounted, which
- * isn't confirmed yet (sensor-driver branch owns the real IMU). Likely the
- * first thing to flip/retune once gestures are tried on real hardware.
+ *                                        (still a heuristic guess, unconfirmed)
+ *   az: DOWN(+)    / UP(-) (about the resting ~1g baseline)
+ *                                     -> GESTURE_SWING_DOWN / _UP
+ * The az mapping was confirmed INVERTED from the original guess by testing
+ * on real hardware (a physical swing up peaks negative on dz, not
+ * positive) and fixed in fusion.c's classifier accordingly. ax/ay are
+ * unchanged from the original guess and still need the same real-hardware
+ * check -- this mapping depends on how the board is physically held/
+ * mounted, so don't assume they're right just because az turned out to
+ * need flipping.
  */
 
 /* Deviation from the gravity baseline (g) that starts a motion episode.
