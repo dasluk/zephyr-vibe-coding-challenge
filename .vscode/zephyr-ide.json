@@ -1,7 +1,6 @@
 {
   "projects": {
     "app": {
-      "rel_path": "app",
       "name": "app",
       "buildConfigs": {
         "build/demo": {
@@ -11,7 +10,6 @@
           "name": "build/demo",
           "westBuildArgs": [],
           "westBuildCMakeArgs": [],
-          "debugOptimization": "Don't set. Will be configured in included KConfig file",
           "confFiles": {
             "config": [],
             "overlay": []
@@ -33,7 +31,6 @@
           "name": "build/native_sim",
           "westBuildArgs": [],
           "westBuildCMakeArgs": [],
-          "debugOptimization": "Don't set. Will be configured in included KConfig file",
           "confFiles": {
             "config": [],
             "overlay": []
@@ -54,7 +51,8 @@
       "confFiles": {
         "config": [],
         "overlay": []
-      }
+      },
+      "relPath": "app"
     }
   }
 }
