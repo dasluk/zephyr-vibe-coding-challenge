@@ -1,5 +1,10 @@
 .venv/
 external
 **/build*/
+
+# git worktrees for parallel agent-team work, e.g. `git worktree add
+# worktrees/wt-<name> -b feature/<name>` - each is its own full checkout
+# on its own branch, not meant to be tracked from here.
+worktrees/
 .vscode/compile_commands.json
 .vscode/extensions.json

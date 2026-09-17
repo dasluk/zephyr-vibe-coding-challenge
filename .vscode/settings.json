@@ -11,5 +11,6 @@
 		"**/build*": true,
 		"**/compile_commands.json": true
 	},
-	"cmake.sourceDirectory": "${workspaceFolder}/app"
+	"cmake.sourceDirectory": "${workspaceFolder}/app",
+	"cmake.configureOnOpen": false
 }
