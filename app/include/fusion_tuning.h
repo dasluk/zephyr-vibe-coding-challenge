@@ -21,8 +21,11 @@
  * first thing to flip/retune once gestures are tried on real hardware.
  */
 
-/* Deviation from the gravity baseline (g) that starts a motion episode. */
-#define FUSION_MOTION_ENTER_G          0.35f
+/* Deviation from the gravity baseline (g) that starts a motion episode.
+ * Raised from an initial 0.35g: that let casual handling/light taps enter
+ * motion tracking at all, which combined with FUSION_MIN_MOTION_MS below
+ * was still producing gesture events for a tap. */
+#define FUSION_MOTION_ENTER_G          0.50f
 
 /* Deviation from baseline (g) below which the board is considered at rest
  * again. Lower than the enter threshold on purpose (hysteresis) so a
@@ -35,6 +38,15 @@
  */
 #define FUSION_REST_CONFIRM_SAMPLES    3
 
+/* Minimum duration (ms) a motion episode must last before it's eligible to
+ * be classified as a gesture at all. A tap/knock on the enclosure is a
+ * sharp, near-instantaneous transient (typically settles back under
+ * FUSION_MOTION_EXIT_G within a couple of samples); a deliberate swing/
+ * shake/punch takes a real hand motion's worth of time. An episode that
+ * closes out faster than this is discarded as noise (back to IDLE, no
+ * event, no cooldown) rather than classified. */
+#define FUSION_MIN_MOTION_MS           100
+
 /* Hard cap on how long a single motion episode can run before it is
  * force-classified. Guards against a sensor that never settles back down.
  */
@@ -42,14 +54,16 @@
 
 /* Per-axis deviation magnitude (g) above which a sample counts toward
  * sign-reversal tracking (used to distinguish SHAKE from a directional
- * swing/punch).
- */
-#define FUSION_REVERSAL_SIGN_G         0.2f
+ * swing/punch). Raised alongside FUSION_MOTION_ENTER_G so reversal
+ * tracking isn't more sensitive than motion entry itself. */
+#define FUSION_REVERSAL_SIGN_G         0.30f
 
 /* Minimum number of dominant-axis sign reversals within one motion episode
  * to classify it as GESTURE_SHAKE instead of a single directional gesture.
- */
-#define FUSION_SHAKE_MIN_REVERSALS     3
+ * Raised from 3: a vigorous but single-direction swing/punch can pick up
+ * a reversal or two from hand jitter alone, so 3 was firing on those too
+ * often. */
+#define FUSION_SHAKE_MIN_REVERSALS     4
 
 /* Cooldown after emitting a gesture event before a new motion episode can
  * start. Keeps one physical motion from producing a flood of events. */

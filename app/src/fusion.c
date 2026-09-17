@@ -182,7 +182,16 @@ static void gesture_sm_update(struct gesture_sm *sm, int64_t t_ms, float dx, flo
         }
 
         if (timed_out || sm->rest_count >= FUSION_REST_CONFIRM_SAMPLES) {
-            gesture_sm_classify_and_emit(sm, t_ms);
+            int64_t motion_duration_ms = t_ms - sm->motion_start_ms;
+
+            if (motion_duration_ms >= FUSION_MIN_MOTION_MS) {
+                gesture_sm_classify_and_emit(sm, t_ms);
+            } else {
+                /* Too brief to be a deliberate gesture (a tap/knock, not
+                 * a swing) -- discard silently, no event, no cooldown. */
+                sm->state = FUSION_STATE_IDLE;
+                sm->rest_count = 0;
+            }
         }
         break;
     }
