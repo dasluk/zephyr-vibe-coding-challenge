@@ -25,6 +25,20 @@ LOG_MODULE_REGISTER(sensor_driver, LOG_LEVEL_INF);
 #define SENSOR_DRIVER_PRIORITY   5
 #define SENSOR_DRIVER_PERIOD_MS  10 /* ~100 Hz */
 
+/* TEMPORARY hardware bring-up aid, per specs/sensor-driver.spec.md's
+ * Definition of Done ("moving the board visibly changes ax/ay/az/gx/gy/gz,
+ * observable via a temporary debug log over RTT"). Off by default so it
+ * has zero effect on normal builds; strip this whole block (and the
+ * matching CONFIG_LOG/CONFIG_USE_SEGGER_RTT/CONFIG_LOG_BACKEND_RTT prj.conf
+ * lines, which are NOT committed here since they belong to the
+ * communication component's logging setup per docs/task-distribution.md)
+ * once hardware bring-up is done, or replace with a permanent mechanism if
+ * still wanted. To re-enable locally: flip this to 1 and add CONFIG_LOG=y,
+ * CONFIG_USE_SEGGER_RTT=y, CONFIG_LOG_BACKEND_RTT=y to app/prj.conf.
+ */
+#define SENSOR_DRIVER_HW_DEBUG_LOG 0
+#define SENSOR_DRIVER_HW_DEBUG_LOG_EVERY 10 /* ~every 100ms at 100Hz */
+
 /* struct imu_sample stores accel in g and gyro in deg/s; the Zephyr sensor
  * API returns SI units (m/s^2, rad/s), so convert on the way out.
  */
@@ -85,6 +99,22 @@ static void sensor_driver_thread(void *p1, void *p2, void *p3)
 		if (rc != 0) {
 			LOG_DBG("imu_sample_q full, dropping sample");
 		}
+
+#if SENSOR_DRIVER_HW_DEBUG_LOG
+		{
+			static uint32_t dbg_count;
+
+			if ((dbg_count++ % SENSOR_DRIVER_HW_DEBUG_LOG_EVERY) == 0) {
+				/* Printed as milli-units (int) to avoid pulling in
+				 * float printf support just for this debug aid.
+				 */
+				LOG_INF("ax=%d ay=%d az=%d mg  gx=%d gy=%d gz=%d mdeg/s",
+					(int)(sample.ax * 1000), (int)(sample.ay * 1000),
+					(int)(sample.az * 1000), (int)(sample.gx * 1000),
+					(int)(sample.gy * 1000), (int)(sample.gz * 1000));
+			}
+		}
+#endif
 
 sleep:
 		k_sleep(K_TIMEOUT_ABS_MS(cycle_start + SENSOR_DRIVER_PERIOD_MS));
